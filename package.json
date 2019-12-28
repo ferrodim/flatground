@@ -1,0 +1,11 @@
+{
+  "name": "flatground",
+  "version": "0.1.0",
+  "description": "",
+  "author": "",
+  "main": "framework.js",
+  "dependencies": {
+    "amqplib": "^0.5.5",
+    "mongodb": "^3.3.4"
+  }
+}
