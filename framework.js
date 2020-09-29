@@ -43,6 +43,7 @@ function RabbitService(){
 }
 
 RabbitService.prototype.bind = async function(queueName, routeKey, callback){
+    await this.channel.assertExchange('topic', 'topic');
     await this.channel.assertQueue(queueName);
     if (Array.isArray(routeKey)){
         for (let route of routeKey){
