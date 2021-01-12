@@ -1,32 +1,46 @@
 const CONNECT_TIMEOUT = 5000;
+const mongodb = require('mongodb');
 
-function MongoService(){
-    this._db = null;
-    this.ready = new Promise((accept, reject) =>  {
-        this.configure = async function(args){
-            let connect_timer = setTimeout(()=>{
-                reject("Mongo connection timeout, after " + CONNECT_TIMEOUT + 'ms wait');
-            }, CONNECT_TIMEOUT);
+class MongoService extends Function {
+    constructor() {
+        super('...args', 'return this.__self__.__call__(...args)')
+        let self = this.bind(this)
+        this.__self__ = self
+        this._db = null;
+        this.ready = new Promise((accept, reject) =>  {
+            this.ready.accept = accept;
+            this.ready.reject = reject;
+        });
+        return self
+    }
 
-            require('mongodb').MongoClient
-                .connect(args.url, {useUnifiedTopology: true})
-                .then(client => {
-                    clearTimeout(connect_timer);
-                    console.log("Connected successfully to db server");
-                    this._db = client.db();
-                    accept();
-                }, err => {
-                    clearTimeout(connect_timer);
-                    reject(err);
-                });
+    __call__(name) {
+        return this.collection(name);
+    }
 
-            return this.ready;
-        };
-    });
+    collection(name){
+        return this._db.collection(name);
+    };
+
+    configure(args){
+        let connect_timer = setTimeout(()=>{
+            this.ready.reject("Mongo connection timeout, after " + CONNECT_TIMEOUT + 'ms wait');
+        }, CONNECT_TIMEOUT);
+
+        mongodb.MongoClient
+            .connect(args.url, {useUnifiedTopology: true})
+            .then(client => {
+                clearTimeout(connect_timer);
+                console.log("Connected successfully to db server");
+                this._db = client.db();
+                this.ready.accept();
+            }, err => {
+                clearTimeout(connect_timer);
+                this.ready.reject(err);
+            });
+
+        return this.ready;
+    }
 }
-
-MongoService.prototype.collection = function(name){
-    return this._db.collection(name);
-};
 
 module.exports = MongoService;
