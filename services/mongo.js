@@ -7,10 +7,13 @@ class MongoService extends Function {
         let self = this.bind(this)
         this.__self__ = self
         this._db = null;
+        let _accept, _reject;
         this.ready = new Promise((accept, reject) =>  {
-            this.ready.accept = accept;
-            this.ready.reject = reject;
+            _accept = accept;
+            _reject = reject;
         });
+        this.ready.accept = _accept;
+        this.ready.reject = _reject;
         return self
     }
 
