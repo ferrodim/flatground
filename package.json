@@ -6,6 +6,6 @@
   "main": "framework.js",
   "dependencies": {
     "amqplib": "^0.7.1",
-    "mongodb": "^3.6.6"
+    "mongodb": "^3.6.10"
   }
 }
